@@ -59,12 +59,14 @@
         source: pull
       become: yes
 
-    - name: Run NGINX Container
-      docker_container:
-        name: nginx_container
-        image: nginx
-        state: started
-        restart_policy: always
-        ports:
-          - "80:80"
-      become: yes
+    - name: copy Docker Compose files
+      copy:
+        src: "{{ item }}"
+        dest: "/root/{{ item }}"
+      loop:
+      - docker-compose.yaml
+
+    - name: Create and start services
+      community.docker.docker_compose_v2:
+        project_src: /root
+      register: output
